@@ -430,8 +430,31 @@ submit your patch!</p>
 <li>
 <p>Create a branch for your changes if you haven&#8217;t done already. Many
 contributors name their branches based on ticket number and Cassandra
-version, e.g. <code>git checkout -b 12345-3.0</code></p>
+version, e.g. <code>git checkout -b 12345-3.0</code> or
+<code>git checkout -b CASSANDRA-12345-3.0</code>.</p>
 </li>
+</ol>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="title">Hint</div>
+<div class="paragraph">
+<p>When working on multiple patches at the same time, instead of cloning
+the repository separately for each of them, set up multiple
+working trees for different Cassandra versions from the same repository
+using <a href="https://git-scm.com/docs/git-worktree">Git worktrees</a> feature.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
 <li>
 <p>Verify that you follow Cassandra&#8217;s <code>code_style</code></p>
 </li>

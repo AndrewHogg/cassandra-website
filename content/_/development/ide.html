@@ -179,46 +179,85 @@
 <h2 id="building-and-ide-integration"><a class="anchor" href="#building-and-ide-integration"></a>Building and IDE Integration</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="building-from-source"><a class="anchor" href="#building-from-source"></a>Building From Source</h3>
+<h3 id="prerequisites"><a class="anchor" href="#prerequisites"></a>Prerequisites</h3>
 <div class="paragraph">
-<p>Building Cassandra from source is the first important step in contributing
-to the Apache Cassandra project.
-You&#8217;ll need to install <a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">Java 8</a>, <a href="https://git-scm.com/">Git</a>, and <a href="http://ant.apache.org/">Ant</a> first.</p>
+<p>Building Cassandra from source is the first important step in contributing to the Apache Cassandra project.
+You will need to install Java (JDK 8 or 11, depending on which version
+you want to build Cassandra against, best is to install both and then
+switch between them when needed), Git, and Ant (including ant-optional).</p>
 </div>
+</div>
+<div class="sect2">
+<h3 id="getting-the-source-code"><a class="anchor" href="#getting-the-source-code"></a>Getting the source code</h3>
 <div class="paragraph">
 <p>The source code for Cassandra is shared on the central Apache Git
 repository and organized by branch, one branch for each major version.
-You can access the code for the current development branch using:</p>
+You can access the code for the current development branch at
+<a href="https://gitbox.apache.org/repos/asf/cassandra.git" class="bare">gitbox.apache.org/repos/asf/cassandra.git</a> (the primary location)
+or at <a href="https://github.com/apache/cassandra" class="bare">github.com/apache/cassandra</a> (a mirror location).</p>
+</div>
+<div class="paragraph">
+<p>However, to develop a patch or a new feature, you should fork the Cassandra
+project first and then clone it from your own fork:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-plaintext hljs" data-lang="plaintext">git clone https://gitbox.apache.org/repos/asf/cassandra.git cassandra-trunk</code></pre>
+<pre class="highlightjs highlight"><code class="language-plaintext hljs" data-lang="plaintext">git clone https://github.com/&lt;your_git_name&gt;/cassandra.git cassandra</code></pre>
 </div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="building-cassandra"><a class="anchor" href="#building-cassandra"></a>Building Cassandra</h3>
+<div class="paragraph">
+<p>Cassandra is a Java project which is built using Ant.
+The build file, <code>build.xml</code> located in the root of the project content,
+has various tasks defined (you can list all of them with some short
+descriptions by running <code>ant -p</code>).</p>
 </div>
 <div class="paragraph">
-<p>Other branches will point to different versions of Cassandra. Switching
-to a different branch requires checking out the branch.
-For example, to checkout the latest version of Cassandra 3.0, use:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-plaintext hljs" data-lang="plaintext">git checkout cassandra-3.0</code></pre>
-</div>
+<p>The build uses the Java compiler which is currently set up in your
+shell. By default, the build uses Java 8. If you want to build
+with Java 11, you need to either add a build property <code>-Duse.jdk11=true</code>
+to your Ant build command or export the environment variable
+<code>CASSANDRA_USE_JDK11=true</code>. Otherwise, if you run the build using
+Java 11, the build script complains.</p>
 </div>
 <div class="paragraph">
-<p>You can get a list of available branches with <code>git branch</code>.</p>
+<p>Now you can build Cassandra with the default task - just execute
+<code>ant</code> or <code>ant jar</code>. This may take a significant amount of time depending
+on artifacts that have to be downloaded or the number of classes that
+need to be compiled. When the build completes, you can find a JAR file
+in the build directory, and the database service can be started with
+the <code>bin/cassandra</code> script.</p>
 </div>
+</div>
+<div class="sect2">
+<h3 id="building-a-distribution"><a class="anchor" href="#building-a-distribution"></a>Building a distribution</h3>
 <div class="paragraph">
-<p>Build Cassandra using ant:</p>
+<p>Some tasks you might be interested in are:</p>
 </div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-plaintext hljs" data-lang="plaintext">ant</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This may take a significant amount of time depending on artifacts that have to
-be downloaded or the number of classes that need to be compiled.</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>build</code> - compile the production code without producing any JARs</p>
+</li>
+<li>
+<p><code>build-test</code> - compile the test code without producing any JARs</p>
+</li>
+<li>
+<p><code>artifacts</code> - generate Cassandra distribution in <code>build/dist</code>
+directory and package it to <code>tar.gz</code> (with and without sources)</p>
+</li>
+<li>
+<p><code>mvn-install</code> - generate <code>cassandra-all</code> JAR artifact along with
+sources and JavaDoc, and install it in the local Maven repository</p>
+</li>
+<li>
+<p><code>realclean</code> - clean the project from any build products, as well as
+from any dependencies (in fact that means removing <code>build</code> and <code>lib</code>
+directories)</p>
+</li>
+</ul>
 </div>
 <div class="admonitionblock tip">
 <table>
@@ -229,16 +268,16 @@ be downloaded or the number of classes that need to be compiled.</p>
 <td class="content">
 <div class="title">Hint</div>
 <div class="paragraph">
-<p>You can setup multiple working trees for different Cassandra versions
-from the same repository using
-<a href="https://git-scm.com/docs/git-worktree">git-worktree</a>.</p>
+<p>Remember to clean the project after switching branches as build artifacts
+are versioned.</p>
 </div>
 </td>
 </tr>
 </table>
 </div>
 <div class="paragraph">
-<p>Now you can get started with Cassandra using IntelliJ IDEA or Eclipse.</p>
+<p>There are other tasks related to testing, and they are covered in
+<a href="testing.adoc">Testing</a> section.</p>
 </div>
 </div>
 <div class="sect2">
@@ -249,17 +288,12 @@ the most popular IDEs for Cassandra and Java development in general.
 The Community Edition can be freely downloaded with all features needed to get started developing Cassandra.</p>
 </div>
 <div class="paragraph">
-<p>Use the following procedure for Cassandra 2.1.5+.
-If you wish to work with older Cassandra versions, see our <a href="https://cwiki.apache.org/confluence/display/CASSANDRA2/RunningCassandraInIDEA">wiki</a> for instructions.</p>
-</div>
-<div class="paragraph">
-<p>First, clone and build Cassandra.
-Then execute the following steps to use IntelliJ IDEA.</p>
+<p>Use the following procedure for Cassandra 2.1.5+:</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Generate the IDEA files using ant:</p>
+<p>Generate project files by executing the following target from Ant build:</p>
 </li>
 </ol>
 </div>
@@ -280,8 +314,28 @@ Then execute the following steps to use IntelliJ IDEA.</p>
 </div>
 <div class="paragraph">
 <p>The project generated by <code>ant generate-idea-files</code> contains
-nearly everything you need to debug Cassandra and execute unit tests.
-You should be able to:</p>
+nearly everything you need to debug Cassandra and execute unit tests.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="title">Hint</div>
+<div class="paragraph">
+<p>Although you do not need to build the project with <code>ant jar</code> to import
+it some tests run tools as external processes and need the regular
+artifacts to be created. Such tests may require you to rebuild the
+project using Ant before each run even when you run the test in IDEA.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>You should be able to:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -302,11 +356,26 @@ You should be able to:</p>
 </li>
 </ul>
 </div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="title">Hint</div>
+<div class="paragraph">
+<p>If you wish to work with older Cassandra versions, see our <a href="https://cwiki.apache.org/confluence/display/CASSANDRA2/RunningCassandraInIDEA">wiki</a> for instructions.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
 </div>
 <div class="sect2">
 <h3 id="opening-cassandra-in-apache-netbeans"><a class="anchor" href="#opening-cassandra-in-apache-netbeans"></a>Opening Cassandra in Apache NetBeans</h3>
 <div class="paragraph">
-<p><a href="https://netbeans.apache.org/">Apache NetBeans</a> is an older open source Java IDE,
+<p><a href="https://netbeans.apache.org/">Apache NetBeans</a> is the elder of the open sourced java IDEs,
 and can be used for Cassandra development.
 There is no project setup or generation required to open Cassandra in NetBeans.
 Use the following procedure for Cassandra 4.0+.</p>
@@ -561,6 +630,21 @@ heap related values as needed.</p>
 <p>You can now set breakpoints and start debugging!</p>
 </div>
 </div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="general-notes"><a class="anchor" href="#general-notes"></a>General notes</h3>
+<div class="paragraph">
+<p>You may sometimes encounter some odd build failures when running the <code>ant</code> commands above. If you do, start <code>ant</code> with the <code>realclean</code> option:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-plaintext hljs" data-lang="plaintext">ant realclean</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Remember that all the tasks mentioned above may depend on building source files. If there are actual compilation errors in the code, you may not be able to generate project files for IntelliJ Idea, Netbeans, or Eclipse.
+It is especially important that you have imported the project adequately into IDE before doing merges or rebases. Otherwise, if there are conflicts, the project cannot be opened in IDE, and you will be unable to use any fancy conflict resolution tools offered by those IDEs.</p>
 </div>
 </div>
 </div>
